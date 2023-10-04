@@ -1,0 +1,101 @@
+create database ejemplo;
+use ejemplo;
+
+/*tabla 1*/
+create table estudiante (
+idestudiante int primary key auto_increment not null,
+dni varchar(8) not null,
+nombre varchar(30) not null,
+apellido varchar(30) not null,
+telefono varchar(9) not null,
+email varchar(30) not null,
+sexo varchar(1) not null,
+direccion varchar(30) not null,
+grado varchar(10) not null,
+seccion varchar(1) not null,
+familiar varchar(30) not null);
+
+insert into estudiante (dni, nombre, apellido, telefono, email, sexo, direccion, grado, seccion, familiar) values
+("12345678","Sebastian", "Castro Pedraza", "987654321", "sebastiancastrop@gmail.com", "M", "Av. Mariano LU Mz H-20", "Primero", "B", "Emilio Castro"),
+("12000000","Carlos", "Flores Zapata", "984372234", "carlosfloresz@gmail.com", "M", "Av. Mariano LU Mz H-10", "Cuarto", "U", "Juan Sanchez"),
+("12345000","Rosa", "Gonzales Prada", "907454221", "rosagonzalesp@gmail.com", "F", "Av. La Marina Mz H-20", "Tercero", "A", "Matilde Apaza");
+
+/*tabla 2*/
+create table profesor (
+idprofesor int primary key auto_increment not null,
+dni varchar(8) not null,
+nombre varchar(30) not null,
+apellido varchar(30) not null,
+telefono varchar(9) not null,
+email varchar(30) not null,
+sexo varchar(1) not null,
+direccion varchar(30) not null,
+sueldo decimal(6,2) not null,
+cursos int not null);
+
+insert into profesor (dni, nombre, apellido, telefono, email, sexo, direccion, sueldo, cursos) values
+("12345678","Gabriel", "Quispe", "987242321", "gabrielquispe@gmail.com", "M", "Av. Mariano LU Mz H-20", 1500.00, 4),
+("12000000","Carla", "Chuquimallco", "910365234", "carlachuquimallco@gmail.com", "M", "Av. Mariano LU Mz H-10", 2300.00, 5),
+("12345000","Merly", "Morales", "572749034", "merly@gmail.com", "F", "Av. La Marina Mz H-20", 1200.00, 2);
+
+/*tabla 3*/
+create table empleado (
+  idempleado int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  apellido varchar(20) NOT NULL,
+  nombre varchar(20) NOT NULL,
+  fecingreso date NOT NULL,
+  email varchar(30) DEFAULT NULL,
+  telefono varchar(20) DEFAULT NULL,
+  idcargo varchar(3) NOT NULL,
+  sueldo decimal(5,2) NOT NULL,
+  comision decimal(6,0) DEFAULT NULL,
+  jefe varchar(5) DEFAULT NULL
+);
+
+INSERT INTO empleado (apellido, nombre, fecingreso, email, telefono, idcargo, sueldo, comision, jefe) VALUES
+('Coronel', 'Gustavo', '2023-04-01', 'gcoronel@perudev.com', '966614457', 'C01', '250.00', null, null),
+('Fernandez', 'Claudia', '2023-05-01', 'cfernandez@perudev.com', '934528365', 'C03', '800.00', null, 'Director'),
+('Matsukawa', 'Sergio', '2023-04-01', 'smatsukawa@perudev.com', '977238369', 'C02', '150.00', null, 'Director'),
+('Diaz', 'Mariela', '2023-04-10', 'mdiaz@perudev.com', '865446734', 'C06', '180.00', null, 'Director');
+
+/*tabla 4*/
+create table director (
+iddirector int primary key auto_increment not null,
+dni varchar(8) not null,
+nombre varchar(30) not null,
+apellido varchar(30) not null,
+telefono varchar(9) not null,
+email varchar(30) not null,
+sexo varchar(1) not null,
+direccion varchar(30) not null,
+sueldo decimal(5,2) not null,
+colegio varchar(30) not null);
+
+insert into director (dni, nombre, apellido, telefono, email, sexo, direccion, sueldo, colegio) values
+("87402342","Johan", "Flores", "478121281", "johanflores@gmail.com", "M", "Av. Pedro H Mz H-20", 300.00, 3),
+("57357239","Jackeline", "Aduvire", "135792468", "jackelineaduvire@gmail.com", "F", "Av. Pedro H Mz H-10", 500.00, 4),
+("56753934","Moises", "Atencio", "992255664", "moises@gmail.com", "M", "Av. La Marina Mz H-10", 2300.00, 2);
+
+/*tabla 5*/
+create table curso (
+idcurso int primary key auto_increment not null,
+codigo varchar(5) not null,
+nombre varchar(30) not null,
+curso_req varchar(5) null,
+curso_post varchar(5) null,
+creditos int not null,
+matriculados int not null,
+profesor_curso varchar(30) not null,
+plan_estudios varchar(4) not null
+);
+
+insert into curso (codigo, nombre, curso_req, curso_post, creditos, matriculados, profesor_curso, plan_estudios) values
+("is-32","Matematica", "is-24", "is-41", 4, 21, "Lic. Paola Celeste", "2018"),
+("is-72","Biologia", null, "is-85", 3, 31, "Lic. Gabriel Quispe", "2018"),
+("is-23","Programacion", "is-13", "is-33", 5, 24, "Dr. Javier Borja", "2018");
+
+select * from curso;
+select * from estudiante;
+select * from profesor;
+select * from empleado;
+select * from director;
