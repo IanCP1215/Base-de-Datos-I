@@ -1,0 +1,296 @@
+USE `veterinaria` ;
+
+/*TRIGGERS PARA INGRESO DE DATOS*/
+DELIMITER //
+create trigger registrar_cita after insert on `veterinaria`.`Cita`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA CITA', now(), concat('Cita del señor(a) ',
+new.`nombre`,' identificado con DNI ',new.`dni`,' con telefono ',new.`telefono`,' y correo ',
+new.`correo`,' para el dia ',new.`fecha`,' a las ',new.`hora`,' horas. Para tratar a su mascota identificado con el codigo ',
+new.`idpaciente`,' de paciente que presenta los sintomas de ',new.`sintomas`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_dueño after insert on `veterinaria`.`Dueño`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA DUEÑO', now(), concat('Registro del señor(a) ',
+new.`nombre`,' identificado con DNI ',new.`dni`,' con telefono ',new.`telefono`,' de edad ',
+new.`edad`,' años. Ademas, dueño de la mascota identificado con el codigo de paciente ',new.`idpaciente`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_historial after insert on `veterinaria`.`Historial`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA HISTORIAL', now(), concat('Registro del historial ',
+new.`idhistorial`,' de la mascota identificado con el codigo paciente ',
+new.`idpaciente`,' y su tratamiento identificado con el codigo tratamiento ',new.`idtratamiento`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_medicamento after insert on `veterinaria`.`Medicamento`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA MEDICAMENTO', now(), concat('Registro del medicamento ',
+new.`nombre`,' identificado con el codigo ',new.`idmedicamento`,' con precio ',new.`precio`,' soles y con descripcion ',
+new.`descripcion`,'. Datos adicionales: Se registro ',new.`stock`,' unidades y tiene fecha de elaboracion ',
+new.`fec_elab`,' y fecha de vencimiento ',new.`fec_venc`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_paciente after insert on `veterinaria`.`Paciente`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA PACIENTE', now(), concat('Registro de la mascota ',
+new.`nombre`,' identificado con el codigo paciente ',new.`idpaciente`,' de especie ',new.`especie`,' y de raza ',
+new.`raza`,', con fecha de nacimiento ',new.`fec_nacimiento`,'. La mascota de color ',
+new.`color`,' de edad ',new.`edad`, 'de estatura ',new.`talla`,' de peso ',new.`peso`,' y que presenta los sintomas de ',
+new.`sintomas`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_personal after insert on `veterinaria`.`Personal`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA PERSONAL', now(), concat('Registro del personal ',
+new.`nombre`,' identificado con DNI ',new.`dni`,' con cargo de ',new.`cargo`,' y de edad ',
+new.`edad`,' en el turno de  ',new.`turno`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger registrar_tratamiento after insert on `veterinaria`.`Tratamiento`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('INGRESO DE DATOS EN LA TABLA TRATAMIENTO', now(), concat('Registro del tratamiento ',
+new.`idtratamiento`,' de tipo ',new.`tipo`,' con fecha de inicio ',new.`fec_inicio`,' y fecha final ',
+new.`fec_final`,'. Para la mascota identificado con el codigo paciente  ',new.`idpaciente`,' y tiene un costo de ',
+new.`costo`,' soles.'));
+end //
+delimiter ;
+
+drop trigger registrar_cita;
+
+select * from `veterinaria`.`Paciente`; /*Mostrar todos los pacientes registrados en el sistema veterinaria*/
+select * from `veterinaria`.`Dueño`; /*Mostrar todos los dueños registrados en el sistema veterinaria*/
+select * from `veterinaria`.`Cita`; /*Mostrar todas las citas registradas en el sistema veterinaria*/
+select * from `veterinaria`.`Tratamiento`; /*Mostrar todos los tratamientos registrados en el sistema veterinaria*/
+select * from `veterinaria`.`Historial`; /*Mostrar todos los historiales registrados en el sistema veterinaria*/
+select * from `veterinaria`.`Medicamento`; /*Mostrar todos los medicamentos disponibles en el sistema veterinaria*/
+select * from `veterinaria`.`Personal`; /*Mostrar todos los personales (veterinarios, asistentes, etc.) en el sistema veterinaria*/
+
+insert into `veterinaria`.`Cita`(`dni`, `nombre`, `telefono`, `correo`, `fecha`, `hora`, `idpaciente`, `sintomas`) values
+('76346107', 'Mary', '993492213', 'mary.castillo@gmail.com', '2023-10-25', '13:00', 'CO-3', 'Malestar digestivo');
+
+insert into `veterinaria`.`Personal`(`dni`, `nombre`, `cargo`, `edad`, `turno`) values
+('45437805', 'Ana', 'Asistente', 24, 'Mañana-Tarde');
+
+/*TRIGGERS PARA ACTUALIZACION DE DATOS*/
+
+DELIMITER //
+create trigger actualizar_tratamiento after update on `veterinaria`.`Tratamiento`
+for each row begin
+declare actualizaciones longtext;
+if new.`idtratamiento` <> old.`idtratamiento` then 
+set actualizaciones = concat('Actualizacion de la columna IDTRATAMIENTO de ',old.`idtratamiento`, ' a ',new.`idtratamiento`, '.'); end if;
+if new.`idpaciente` <> old.`idpaciente` then 
+set actualizaciones = concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '.'); end if;
+if new.`tipo` <> old.`tipo` then 
+set actualizaciones = concat('Actualizacion de la columna TIPO de ',old.`tipo`, ' a ',new.`tipo`, '.'); end if;
+if new.`fec_inicio` <> old.`fec_inicio` then 
+set actualizaciones = concat('Actualizacion de la columna FEC_INICIO de ',old.`fec_inicio`, ' a ',new.`fec_inicio`, '.'); end if;
+if new.`fec_final` <> old.`fec_final` then 
+set actualizaciones = concat('Actualizacion de la columna FEC_FINAL de ',old.`fec_final`, ' a ',new.`fec_final`, '.'); end if;
+if new.`costo` <> old.`costo` then 
+set actualizaciones = concat('Actualizacion de la columna COSTO de ',old.`costo`, ' a ',new.`costo`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA TRATAMIENTO', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_personal after update on `veterinaria`.`Personal`
+for each row begin
+declare actualizaciones longtext;
+if new.`dni` <> old.`dni` then 
+set actualizaciones = concat('Actualizacion de la columna DNI de ',old.`dni`, ' a ',new.`dni`, '.'); end if;
+if new.`nombre` <> old.`nombre` then 
+set actualizaciones = concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '.'); end if;
+if new.`cargo` <> old.`cargo` then 
+set actualizaciones = concat('Actualizacion de la columna CARGO de ',old.`cargo`, ' a ',new.`cargo`, '.'); end if;
+if new.`edad` <> old.`edad` then 
+set actualizaciones = concat('Actualizacion de la columna EDAD de ',old.`edad`, ' a ',new.`edad`, '.'); end if;
+if new.`turno` <> old.`turno` then 
+set actualizaciones = concat('Actualizacion de la columna TURNO de ',old.`turno`, ' a ',new.`turno`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA PERSONAL', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_paciente after update on `veterinaria`.`Paciente`
+for each row begin
+declare actualizaciones longtext;
+if new.`idpaciente` <> old.`idpaciente` then 
+set actualizaciones = concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '.'); end if;
+if new.`nombre` <> old.`nombre` then 
+set actualizaciones = concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '.'); end if;
+if new.`especie` <> old.`especie` then 
+set actualizaciones = concat('Actualizacion de la columna ESPECIE de ',old.`especie`, ' a ',new.`especie`, '.'); end if;
+if new.`raza` <> old.`raza` then 
+set actualizaciones = concat('Actualizacion de la columna RAZA de ',old.`raza`, ' a ',new.`raza`, '.'); end if;
+if new.`fec_nacimiento` <> old.`fec_nacimiento` then 
+set actualizaciones = concat('Actualizacion de la columna FEC_NACIMIENTO de ',old.`fec_nacimiento`, ' a ',new.`fec_nacimiento`, '.'); end if;
+if new.`color` <> old.`color` then 
+set actualizaciones = concat('Actualizacion de la columna COLOR de ',old.`color`, ' a ',new.`color`, '.'); end if;
+if new.`peso` <> old.`peso` then 
+set actualizaciones = concat('Actualizacion de la columna PESO de ',old.`peso`, ' a ',new.`peso`, '.'); end if;
+if new.`talla` <> old.`talla` then 
+set actualizaciones = concat('Actualizacion de la columna TALLA de ',old.`talla`, ' a ',new.`talla`, '.'); end if;
+if new.`edad` <> old.`edad` then 
+set actualizaciones = concat('Actualizacion de la columna EDAD de ',old.`edad`, ' a ',new.`edad`, '.'); end if;
+if new.`sintomas` <> old.`sintomas` then 
+set actualizaciones = concat('Actualizacion de la columna SINTOMAS de ',old.`sintomas`, ' a ',new.`sintomas`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA PACIENTE', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_medicamento after update on `veterinaria`.`Medicamento`
+for each row begin
+declare actualizaciones longtext;
+if new.`idmedicamento` <> old.`idmedicamento` then 
+set actualizaciones = concat('Actualizacion de la columna IDMEDICAMENTO de ',old.`idmedicamento`, ' a ',new.`idmedicamento`, '.'); end if;
+if new.`nombre` <> old.`nombre` then 
+set actualizaciones = concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '.'); end if;
+if new.`stock` <> old.`stock` then 
+set actualizaciones = concat('Actualizacion de la columna STOCK de ',old.`stock`, ' a ',new.`stock`, '.'); end if;
+if new.`descripcion` <> old.`descripcion` then 
+set actualizaciones = concat('Actualizacion de la columna DESCRIPCION de ',old.`descripcion`, ' a ',new.`descripcion`, '.'); end if;
+if new.`fec_elab` <> old.`fec_elab` then 
+set actualizaciones = concat('Actualizacion de la columna FEC_ELAB de ',old.`fec_elab`, ' a ',new.`fec_elab`, '.'); end if;
+if new.`fec_venc` <> old.`fec_venc` then 
+set actualizaciones = concat('Actualizacion de la columna FEC_VENC de ',old.`fec_venc`, ' a ',new.`fec_venc`, '.'); end if;
+if new.`precio` <> old.`precio` then 
+set actualizaciones = concat('Actualizacion de la columna TIPO de ',old.`precio`, ' a ',new.`precio`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA MEDICAMENTO', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_historial after update on `veterinaria`.`Historial`
+for each row begin
+declare actualizaciones longtext;
+if new.`idhistorial` <> old.`idhistorial` then 
+set actualizaciones = concat('Actualizacion de la columna IDHISTORIAL de ',old.`idhistorial`, ' a ',new.`idhistorial`, '.'); end if;
+if new.`idpaciente` <> old.`idpaciente` then 
+set actualizaciones = concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '.'); end if;
+if new.`idtratamiento` <> old.`idtratamiento` then 
+set actualizaciones = concat('Actualizacion de la columna IDTRATAMIENTO de ',old.`idtratamiento`, ' a ',new.`idtratamiento`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA HISTORIAL', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_dueño after update on `veterinaria`.`Dueño`
+for each row begin
+declare actualizaciones longtext;
+if new.`dni` <> old.`dni` then 
+set actualizaciones = concat('Actualizacion de la columna DNI de ',old.`dni`, ' a ',new.`dni`, '.'); end if;
+if new.`nombre` <> old.`nombre` then 
+set actualizaciones = concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '.'); end if;
+if new.`idpaciente` <> old.`idpaciente` then 
+set actualizaciones = concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '.'); end if;
+if new.`edad` <> old.`edad` then 
+set actualizaciones = concat('Actualizacion de la columna EDAD de ',old.`edad`, ' a ',new.`edad`, '.'); end if;
+if new.`telefono` <> old.`telefono` then 
+set actualizaciones = concat('Actualizacion de la columna TELEFONO de ',old.`telefono`, ' a ',new.`telefono`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA DUEÑO', now(), actualizaciones);
+end //
+delimiter ;
+
+DELIMITER //
+create trigger actualizar_cita after update on `veterinaria`.`Cita`
+for each row begin
+declare actualizaciones longtext;
+if new.`dni` <> old.`dni` then 
+set actualizaciones = concat('Actualizacion de la columna DNI de ',old.`dni`, ' a ',new.`dni`, '.'); end if;
+if new.`nombre` <> old.`nombre` then 
+set actualizaciones = concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '.'); end if;
+if new.`telefono` <> old.`telefono` then 
+set actualizaciones = concat('Actualizacion de la columna TELEFONO de ',old.`telefono`, ' a ',new.`telefono`, '.'); end if;
+if new.`correo` <> old.`correo` then 
+set actualizaciones = concat('Actualizacion de la columna CORREO de ',old.`correo`, ' a ',new.`correo`, '.'); end if;
+if new.`fecha` <> old.`fecha` then 
+set actualizaciones = concat('Actualizacion de la columna FECHA de ',old.`fecha`, ' a ',new.`fecha`, '.'); end if;
+if new.`hora` <> old.`hora` then 
+set actualizaciones = concat('Actualizacion de la columna HORA de ',old.`hora`, ' a ',new.`hora`, '.'); end if;
+if new.`idpaciente` <> old.`idpaciente` then 
+set actualizaciones = concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '.'); end if;
+if new.`sintomas` <> old.`sintomas` then 
+set actualizaciones = concat('Actualizacion de la columna SINTOMAS de ',old.`sintomas`, ' a ',new.`sintomas`, '.'); end if;
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA TRATAMIENTO', now(), actualizaciones);
+end //
+delimiter ;
+
+update `veterinaria`.`Tratamiento` set `veterinaria`.`Tratamiento`.`fec_inicio`=curdate(), 
+`veterinaria`.`Tratamiento`.`fec_final`='2023-10-28' where `veterinaria`.`Tratamiento`.`idtratamiento`='TR-10102023-GA-2';
+
+/* TRIGGERS PARA ELIMINAR REGISTROS*/
+
+DELIMITER //
+create trigger eliminar_cita after delete on `veterinaria`.`Cita`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA CITA', now(), concat('Se elimino el registro con el identificador DNI = ',old.`dni`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_dueño after delete on `veterinaria`.`Dueño`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA DUEÑO', now(), concat('Se elimino el registro con el identificador DNI = ',old.`dni`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_tratamiento after delete on `veterinaria`.`Tratamiento`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA TRATAMIENTO', now(), concat('Se elimino el registro con el identificador IDTRATAMIENTO = ',old.`idtratamiento`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_historial after delete on `veterinaria`.`Historial`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA HISTORIAL', now(), concat('Se elimino el registro con el identificador IDHISTORIAL = ',old.`idhistorial`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_medicamento after delete on `veterinaria`.`Medicamento`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA MEDICAMENTO', now(), concat('Se elimino el registro con el identificador IDMEDICAMENTO = ',old.`idmedicamento`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_paciente after delete on `veterinaria`.`Paciente`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA PACIENTE', now(), concat('Se elimino el registro con el identificador IDPACIENTE = ',old.`idpaciente`));
+end //
+delimiter ;
+
+DELIMITER //
+create trigger eliminar_personal after delete on `veterinaria`.`Personal`
+for each row begin insert into dbregistros (accion, fecha, descripcion) values
+('ELIMINACION DE DATOS EN LA TABLA PERSONAL', now(), concat('Se elimino el registro con el identificador DNI = ',old.`dni`));
+end //
+delimiter ;
+
+delete from `veterinaria`.`Cita` where `veterinaria`.`Cita`.`dni`='71891695';
+drop trigger actualizar_personal;
