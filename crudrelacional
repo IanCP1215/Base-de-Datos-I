@@ -1,0 +1,216 @@
+use veterinaria;
+
+show tables;
+
+select * from paciente;
+select * from paciente where idpaciente='';
+SELECT * FROM paciente where idpaciente='PE-05';
+select * from dueño;
+select idpaciente from paciente where idpaciente not in (select idpaciente from dueño);
+select * from medicamento;
+select * from paciente;
+select * from personal;
+select * from tratamiento;
+select idpaciente from tratamiento where idpaciente not in (select idpaciente from cita);
+select * from cita;
+select dni from dueño where dni not in (select dni from cita);
+select * from cita where dni='74862193'and idpaciente='GA-13';
+select * from dueño where dni not in (select dni from cita);
+select idpaciente from paciente where idpaciente not in (select idpaciente from cita);
+select dni from dueño where dni not in (select dni from cita);
+select * from historial;
+select * from tratamiento where idtratamiento in (select idtratamiento from historial where idhistorial='HIS-GA-1');
+select * from dbregistros;
+select idpaciente from paciente where idpaciente not in (select idpaciente from tratamiento);
+select idtratamiento from tratamiento where idtratamiento not in (select idtratamiento from historial);
+/* Operaciones adicionales */
+
+select fec_inicio, count(*) as veces from tratamiento group by fec_inicio;
+select fec_inicio from tratamiento group by fec_inicio having fec_inicio > '2023-10-15';
+select distinct sintomas from paciente;
+
+insert into `veterinaria`.`Medicamento`(`idmedicamento`, `nombre`, `stock`, `descripcion`, `fec_elab`, `fec_venc`, `precio`) values
+('MED-LT40100', 'Rimadyl carprofeno', 18, 'Alivio del dolor e inflamacion en perros', curdate(), '2028-11-21', 55.00),
+('MED-LT40105', 'Benadryl (difenhidramina)', 10, 'Antihistaminico para alivio alergias perros y gatos', curdate(), '2028-11-21', 79.00),
+('MED-LT40110', 'Frontline fipronil', 12, 'Antiinflamatorio para aliviar el dolor en perros y gatos', curdate(), '2028-11-21', 34.00),
+('MED-LT40115', 'Metacam meloxicam', 14, 'Prevencion de infestaciones pulgas y garrapatas', curdate(), '2028-11-21', 45.00),
+('MED-LT40120', 'Revolution selamectina', 14, 'Medicamento topico previene infestaciones pulgas, garrapatas, acaros y parasitos', curdate(), '2028-11-21', 45.00);
+
+create table usuarios (
+idusuario int primary key auto_increment not null,
+nombre varchar(45) not null,
+correo varchar(45) not null,
+usuario varchar(15) not null,
+clave varchar(15) not null);
+
+insert into usuarios (nombre, correo, usuario, clave) values 
+('Sebastian', 'ian.cp1695@gmail.com', 'ianCP', '12345');
+
+select * from usuarios;
+
+SELECT COUNT(*) FROM paciente;
+
+update paciente set idpaciente='PE-02' where idpaciente='HA-02';
+delete from paciente where idpaciente='PE-28';
+
+alter table dueño
+drop foreign key fk_dueño_paciente;
+
+alter table dueño
+add constraint fk_dueño_paciente
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade on update cascade;
+
+alter table cita
+drop foreign key fk_cita_paciente;
+
+alter table cita
+add constraint fk_cita_paciente
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade;
+
+alter table cita
+drop foreign key fk_cita_dueño;
+
+alter table cita
+add constraint fk_cita_dueño
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade on update cascade;
+
+alter table historial
+drop foreign key fk_hisotorial_tratamiento;
+
+alter table historial
+add constraint fk_historial_tratamiento
+foreign key (idtratamiento)
+references tratamiento(idtratamiento) on delete cascade on update cascade;
+
+alter table historial
+drop foreign key fk_historial_paciente;
+
+alter table historial
+add constraint fk_historial_paciente
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade on update cascade;
+
+select * from usuarios;
+select * from historial;
+select * from tratamiento;
+select * from paciente;
+select * from cita;
+select * from dueño;
+select * from tratamiento where idtratamiento in (select idtratamiento from historial where idhistorial='HIS-GA-01');
+select * from paciente where idpaciente in (select idpaciente from historial where idhistorial='HIS-GA-01');
+
+update tratamiento set idtratamiento='TR-11102023-GA' where idtratamiento= 'TR-11102023-GA-1';
+
+alter table tratamiento
+drop column fec_inicio;
+
+update tratamiento set tiempo='3 dias' where idtratamiento='TR-06122023-PE' and idpaciente='PE-01';
+
+select distinct idtratamiento from tratamiento where idtratamiento like 'TR-GA%';
+
+delete from tratamiento where idtratamiento='TR-HA-CAT-D';
+
+/* INGRESAR CITAS */
+
+select a.dni, a.nombre, a.telefono, a.idpaciente, b.sintomas from dueño a inner join paciente b 
+where a.dni not in (select dni from cita) and a.idpaciente=b.idpaciente;
+select * from dueño;
+select idpaciente from paciente where idpaciente not in (select idpaciente from dueño);
+select idpaciente, sintomas from paciente where idpaciente not in (select idpaciente from historial); 
+
+drop table paciente;
+drop table dueño;
+drop table cita;
+drop table tratamiento;
+drop table historial;
+drop table personal;
+drop table medicamento;
+drop table DBregistros;
+drop table usuarios;
+
+alter table tratamiento
+drop foreign key fk_tratamiento_historial;
+
+alter table tratamiento
+add constraint fk_tratamiento_historial
+foreign key (idtratamiento)
+references historial(idtratamiento) on delete cascade on update cascade;
+
+alter table cita
+add index idx_cita (idpaciente);
+
+drop database veterinaria;
+
+INSERT INTO `veterinaria`.`usuarios` (`nombre`, `correo`, `usuario`, `clave`) 
+VALUES ('Moises', 'moises.atencio@gmail.com', 'matencioca', '12345');
+
+INSERT INTO paciente (idpaciente, nombre, especie, raza, fec_nacimiento, color, peso, talla, edad, sintomas) values 
+('PE-01', 'Hachi', 'Perro', 'Husky Siberiano', '2016-10-16', 'Blanco con negro',12.45 ,1.14 , '7 años 1 mes', 'Resfriado');
+
+alter table paciente
+drop foreign key fk_paciente_dueño;
+alter table paciente
+drop foreign key fk_paciente_historial;
+alter table paciente
+drop foreign key fk_paciente_tratamiento;
+alter table paciente
+drop foreign key fk_paciente_cita;
+alter table tratamiento
+drop foreign key fk_tratamiento_historial;
+
+alter table historial
+add constraint fk_historial_paciente
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade on update cascade;
+
+alter table historial
+add constraint fk_historial_tratamiento
+foreign key (idtratamiento)
+references tratamiento(idtratamiento) on delete cascade on update cascade;
+
+alter table tratamiento
+add constraint fk_tratamiento_paciente
+foreign key (idpaciente)
+references paciente(idpaciente) on delete cascade on update cascade;
+
+select * from usuarios;
+select * from historial;
+select * from tratamiento;
+select * from paciente;
+select * from cita;
+select * from dueño;
+select * from medicamento;
+select * from personal;
+select * from dbregistros;
+
+DELIMITER //
+create trigger actualizar_paciente after update on `veterinaria`.`Paciente`
+for each row begin
+set @actualizaciones = CONCAT (
+if (new.`idpaciente` <> old.`idpaciente`, concat('Actualizacion de la columna IDPACIENTE de ',old.`idpaciente`, ' a ',new.`idpaciente`, '. '), ""),
+if (new.`nombre` <> old.`nombre` , concat('Actualizacion de la columna NOMBRE de ',old.`nombre`, ' a ',new.`nombre`, '. '), ""),
+if (new.`especie` <> old.`especie` , concat('Actualizacion de la columna ESPECIE de ',old.`especie`, ' a ',new.`especie`, '. '), ""),
+if (new.`raza` <> old.`raza` , concat('Actualizacion de la columna RAZA de ',old.`raza`, ' a ',new.`raza`, '.'), ""),
+if (new.`fec_nacimiento` <> old.`fec_nacimiento` , concat('Actualizacion de la columna FEC_NACIMIENTO de ',old.`fec_nacimiento`, ' a ',new.`fec_nacimiento`, '. '), ""),
+if (new.`color` <> old.`color` , concat('Actualizacion de la columna COLOR de ',old.`color`, ' a ',new.`color`, '. '), ""),
+if (new.`peso` <> old.`peso` , concat('Actualizacion de la columna PESO de ',old.`peso`, ' a ',new.`peso`, '. '), ""),
+if (new.`talla` <> old.`talla` , concat('Actualizacion de la columna TALLA de ',old.`talla`, ' a ',new.`talla`, '. '), ""),
+if (new.`edad` <> old.`edad` , concat('Actualizacion de la columna EDAD de ',old.`edad`, ' a ',new.`edad`, '. '), ""),
+if (new.`sintomas` <> old.`sintomas` , concat('Actualizacion de la columna SINTOMAS de ',old.`sintomas`, ' a ',new.`sintomas`, '. '), ""));
+insert into dbregistros (accion, fecha, descripcion) values
+('ACTUALIZACION DE DATOS EN LA TABLA PACIENTE', now(), @actualizaciones);
+end //
+delimiter ;
+
+alter table cita
+add constraint fk_cita_dueño
+foreign key (dni)
+references dueño(dni) on delete cascade on update cascade;
+
+UPDATE `veterinaria`.`dueño` SET `dni` = '50152560' WHERE (`dni` = '06318181') and (`idpaciente` = 'PE-01');
+
+UPDATE `veterinaria`.`paciente` SET `idpaciente` = 'PE-25' WHERE (`idpaciente` = 'PE-05');
+
